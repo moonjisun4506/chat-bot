@@ -14,12 +14,15 @@ const SYSTEM_PROMPT = `너는 사용자의 오랜 친구야. 항상 친구처럼
 - 너무 길게 늘어놓지 말고 간결하게 답해.
 - 이모지는 가끔만 가볍게 써.`;
 
-if (!process.env.OPENAI_API_KEY) {
-  console.error("OPENAI_API_KEY가 .env 파일에 설정되어 있지 않습니다.");
-  process.exit(1);
-}
+// 서버리스(Vercel) 환경에서는 process.exit()로 종료하면 함수 전체가 죽으므로,
+// 키가 없을 때는 요청 단계에서 오류 응답을 보낸다.
+const openai = process.env.OPENAI_API_KEY
+  ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  : null;
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+if (!openai) {
+  console.error("OPENAI_API_KEY 환경 변수가 설정되어 있지 않습니다.");
+}
 
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
@@ -47,6 +50,10 @@ app.post("/api/chat", async (req, res) => {
     return res.status(400).json({ error: "마지막 메시지는 사용자 메시지여야 합니다." });
   }
 
+  if (!openai) {
+    return res.status(500).json({ error: "서버에 OPENAI_API_KEY가 설정되어 있지 않습니다." });
+  }
+
   try {
     const completion = await openai.chat.completions.create({
       model: MODEL,
@@ -60,6 +67,11 @@ app.post("/api/chat", async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`서버 실행 중: http://localhost:${PORT}`);
-});
+// Vercel은 export한 app을 서버리스 함수로 실행하므로 직접 listen하지 않는다.
+if (!process.env.VERCEL) {
+  app.listen(PORT, () => {
+    console.log(`서버 실행 중: http://localhost:${PORT}`);
+  });
+}
+
+export default app;
