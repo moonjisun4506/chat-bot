@@ -1,0 +1,15 @@
+{
+  "name": "chat_app",
+  "version": "1.0.0",
+  "description": "OpenAI gpt-4o-mini를 사용하는 간단한 AI 챗봇",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file=.env server.js",
+    "dev": "node --env-file=.env --watch server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "openai": "^7.30.0"
+  }
+}

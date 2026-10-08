@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 챗봇</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="chat-container">
+    <header class="chat-header">
+      <h1>AI 챗봇</h1>
+      <button id="reset-btn" type="button">새 대화</button>
+    </header>
+
+    <main id="chat-box" class="chat-box">
+      <div class="message assistant">안녕! 오늘은 무슨 얘기 해볼까? 😊</div>
+    </main>
+
+    <form id="chat-form" class="chat-form">
+      <textarea
+        id="user-input"
+        rows="1"
+        placeholder="메시지를 입력하세요 (Shift+Enter: 줄바꿈)"
+        required
+      ></textarea>
+      <button id="send-btn" type="submit">전송</button>
+    </form>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
