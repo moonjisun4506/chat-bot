@@ -27,6 +27,10 @@ if (!openai) {
 app.use(express.json({ limit: "1mb" }));
 app.use(express.static("public"));
 
+// Vercel에서는 express.static이 무시되고 public/ 파일은 CDN에서 직접 제공되므로,
+// 함수로 들어온 "/" 요청은 index.html로 보낸다.
+app.get("/", (req, res) => res.redirect("/index.html"));
+
 // 대화 기록은 DB 없이 클라이언트가 보관하고, 요청마다 전체 기록을 함께 보낸다.
 app.post("/api/chat", async (req, res) => {
   const { messages } = req.body;
@@ -63,7 +67,8 @@ app.post("/api/chat", async (req, res) => {
     res.json({ reply: completion.choices[0].message.content });
   } catch (err) {
     console.error("OpenAI API 오류:", err);
-    res.status(500).json({ error: "AI 응답을 가져오는 중 오류가 발생했습니다." });
+    const status = err.status ? ` (OpenAI ${err.status})` : "";
+    res.status(500).json({ error: `AI 응답을 가져오는 중 오류가 발생했습니다.${status}` });
   }
 });
 
